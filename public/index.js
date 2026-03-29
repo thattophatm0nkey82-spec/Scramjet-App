@@ -27,6 +27,9 @@
           naiiveRewriter: false,
           scramitize: false,
         },
+        config: {
+          bare: "wss://apple-apple.up.railway.app/wisp/",
+        },
       });
       await scram.init("/scram/scramjet.worker.js");
       window.scram = scram;

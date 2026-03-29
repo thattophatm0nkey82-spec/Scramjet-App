@@ -14,31 +14,40 @@
   function initScramjet() {
     if (scramInitPromise) return scramInitPromise;
     scramInitPromise = (async () => {
-      if (typeof ScramjetController === 'undefined') return;
-      scram = new ScramjetController({
-        prefix: "/~/sj/",
-        files: {
-          wasm: "/scram/scramjet.wasm.wasm",
-          all: "/scram/scramjet.all.js",
-          sync: "/scram/scramjet.sync.js",
-        },
-        flags: {
-          rewriterLogs: false,
-          naiiveRewriter: false,
-          scramitize: false,
-        },
-        config: {
-          bare: "wss://apple-apple.up.railway.app/wisp/",
-        },
-      });
-      await scram.init("/scram/scramjet.worker.js");
-      window.scram = scram;
-      scramReady = true;
+      if (typeof ScramjetController === 'undefined') {
+        console.error('[seam] ScramjetController not found — scramjet.all.js may not have loaded');
+        return;
+      }
+      try {
+        scram = new ScramjetController({
+          prefix: "/~/sj/",
+          files: {
+            wasm: "/scram/scramjet.wasm.wasm",
+            all: "/scram/scramjet.all.js",
+            sync: "/scram/scramjet.sync.js",
+          },
+          flags: {
+            rewriterLogs: false,
+            naiiveRewriter: false,
+            scramitize: false,
+          },
+          config: {
+            bare: "wss://apple-apple.up.railway.app/wisp/",
+          },
+        });
+        await scram.init("/scram/scramjet.worker.js");
+        window.scram = scram;
+        scramReady = true;
+        console.log('[seam] Scramjet ready ✓');
+      } catch(e) {
+        console.error('[seam] Scramjet init failed:', e);
+      }
     })();
     return scramInitPromise;
   }
 
-  window.addEventListener("load", initScramjet);
+  // Start loading immediately, don't wait for window load
+  initScramjet();
 
   async function encodeUrl(url) {
     if (!url.startsWith("http")) url = "https://" + url;
